@@ -344,7 +344,8 @@
 
         // nobody retain this block.
         JPPlayVideoConfiguration internalConfigFinishedBlock = ^(UIView *view, JPVideoPlayerModel *model){
-            NSParameterAssert(model);
+            // incase cannot play video 08/08/2020 by Liberty
+//            NSParameterAssert(model);
             if(configurationCompletion){
                 configurationCompletion(self, model);
             }
@@ -471,8 +472,12 @@
                          animations:^{
                             if (orientation == JPVideoPlayViewInterfaceOrientationLandscapeRight) {
                                 [self executeLandscapeRight];
-                            } else {
+                            } else if (orientation == JPVideoPlayViewInterfaceOrientationLandscapeLeft)  {
                                 [self executeLandscapeLeft];
+                            } else {
+                                // JPVideoPlayViewInterfaceOrientationLandscapePortrait
+                                // Liberty 06-03-2020
+                                [self executeLandscapePortrait];
                             }
                          }
                          completion:^(BOOL finished) {
@@ -492,8 +497,12 @@
     else{
         if (orientation == JPVideoPlayViewInterfaceOrientationLandscapeRight) {
             [self executeLandscapeRight];
-        } else {
+        } else if (orientation == JPVideoPlayViewInterfaceOrientationLandscapeLeft)  {
             [self executeLandscapeLeft];
+        } else {
+            // JPVideoPlayViewInterfaceOrientationLandscapePortrait
+            // Liberty 06-03-2020
+            [self executeLandscapePortrait];
         }
         if (completion) {
             completion();
@@ -617,6 +626,17 @@
     videoPlayerView.bounds = bounds;
     videoPlayerView.center = center;
     videoPlayerView.transform = CGAffineTransformMakeRotation(-M_PI_2);
+    [[JPVideoPlayerManager sharedManager] videoPlayer].playerModel.playerLayer.frame = bounds;
+}
+
+- (void)executeLandscapePortrait {
+    UIView *videoPlayerView = self.helper.videoPlayerView;
+    CGRect screenBounds = [[UIScreen mainScreen] bounds];
+    CGRect bounds = CGRectMake(0, 0, CGRectGetWidth(screenBounds), CGRectGetHeight(screenBounds));
+    CGPoint center = CGPointMake(CGRectGetMidX(screenBounds), CGRectGetMidY(screenBounds));
+    videoPlayerView.bounds = bounds;
+    videoPlayerView.center = center;
+    
     [[JPVideoPlayerManager sharedManager] videoPlayer].playerModel.playerLayer.frame = bounds;
 }
 
